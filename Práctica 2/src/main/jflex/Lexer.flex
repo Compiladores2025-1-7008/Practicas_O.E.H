@@ -10,9 +10,7 @@ import main.java.Token;
 %%
 
 %{
-
-public Token actual;
-
+    public Token actual;
 %}
 
 %public
@@ -20,8 +18,33 @@ public Token actual;
 %standalone
 %unicode
 
-espacio=[ \t\n]
+espacio=[ \t\n\r]+
 
 %%
 
-{espacio} {/* La acción léxica puede ir vacía si queremos que el escáner ignore la regla */}
+{espacio} {/* Ignorar espacios en blanco */}
+
+/* Palabras clave */
+"int"                { return new Token(ClaseLexica.INT, yytext()); }
+"float"              { return new Token(ClaseLexica.FLOAT, yytext()); }
+"if"                 { return new Token(ClaseLexica.IF, yytext()); }
+"else"               { return new Token(ClaseLexica.ELSE, yytext()); }
+"while"              { return new Token(ClaseLexica.WHILE, yytext()); }
+
+/* Números */
+[0-9]+               { return new Token(ClaseLexica.NUMERO, yytext()); }
+[0-9]+\.[0-9]+(e[+-]?[0-9]+)? { return new Token(ClaseLexica.NUMERO, yytext()); }
+
+/* Identificadores */
+[a-zA-Z_][a-zA-Z0-9_]* { return new Token(ClaseLexica.ID, yytext()); }
+
+/* Símbolos */
+";"                  { return new Token(ClaseLexica.PYC, yytext()); }
+","                  { return new Token(ClaseLexica.COMA, yytext()); }
+"("                  { return new Token(ClaseLexica.LPAR, yytext()); }
+")"                  { return new Token(ClaseLexica.RPAR, yytext()); }
+
+/* Errores */
+.                    { System.out.println("Error: Caracter no reconocido: " + yytext()); }
+
+%%
