@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<project name="LexerProject" basedir="." default="run">
+
+    <!-- Define where to put compiled class files -->
+    <property name="build.dir" location="build"/>
+    <property name="src.dir" location="src"/>
+    <property name="jflex.dir" location="src/main/jflex"/>
+    <property name="class.dir" location="src/main/java"/>
+    <property name="test.file" location="src/tst/prueba.txt"/>
+
+    <!-- Create build directory if it doesn't exist -->
+    <target name="init">
+        <mkdir dir="${build.dir}"/>
+    </target>
+
+    <!-- Generate lexer from JFlex file -->
+    <target name="generate" depends="init">
+        <jflex file="${jflex.dir}/Lexer.flex"/>
+    </target>
+
+    <!-- Compile Java sources -->
+    <target name="compile" depends="generate">
+        <javac srcdir="${src.dir}/main/java" destdir="${build.dir}">
+            <include name="**/*.java"/>
+        </javac>
+    </target>
+
+    <!-- Run the lexer -->
+    <target name="run" depends="compile">
+        <java classname="main.jflex.Lexer" fork="true">
+            <arg value="${test.file}"/>
+            <classpath>
+                <fileset dir="${build.dir}" includes="**/*.class"/>
+            </classpath>
+        </java>
+    </target>
+
+</project>
