@@ -1,6 +1,6 @@
 /**
  * Escáner que detecta el lenguaje C_1
-*/
+ */
 
 package main.jflex;
 
@@ -10,7 +10,7 @@ import main.java.Token;
 %%
 
 %{
-    public Token actual;
+public Token actual;
 %}
 
 %public
@@ -18,33 +18,26 @@ import main.java.Token;
 %standalone
 %unicode
 
-espacio=[ \t\n\r]+
+espacio = [ \t\n\r]+
 
 %%
 
-{espacio} {/* Ignorar espacios en blanco */}
+{espacio} { /* Ignorar espacios */ }
 
-/* Palabras clave */
-"int"                { return new Token(ClaseLexica.INT, yytext()); }
-"float"              { return new Token(ClaseLexica.FLOAT, yytext()); }
-"if"                 { return new Token(ClaseLexica.IF, yytext()); }
-"else"               { return new Token(ClaseLexica.ELSE, yytext()); }
-"while"              { return new Token(ClaseLexica.WHILE, yytext()); }
+"int"       { System.out.println(new Token(ClaseLexica.INT, "int")); }
+"float"     { System.out.println(new Token(ClaseLexica.FLOAT, "float")); }
+"if"        { System.out.println(new Token(ClaseLexica.IF, "if")); }
+"else"      { System.out.println(new Token(ClaseLexica.ELSE, "else")); }
+"while"     { System.out.println(new Token(ClaseLexica.WHILE, "while")); }
 
-/* Números */
-[0-9]+               { return new Token(ClaseLexica.NUMERO, yytext()); }
-[0-9]+\.[0-9]+(e[+-]?[0-9]+)? { return new Token(ClaseLexica.NUMERO, yytext()); }
+[0-9]+      { System.out.println(new Token(ClaseLexica.NUMERO, yytext())); }
+[0-9]+"."[0-9]+([eE][+-]?[0-9]+)? { System.out.println(new Token(ClaseLexica.NUMERO, yytext())); }
 
-/* Identificadores */
-[a-zA-Z_][a-zA-Z0-9_]* { return new Token(ClaseLexica.ID, yytext()); }
+[a-zA-Z_][a-zA-Z0-9_]* { System.out.println(new Token(ClaseLexica.ID, yytext())); }
 
-/* Símbolos */
-";"                  { return new Token(ClaseLexica.PYC, yytext()); }
-","                  { return new Token(ClaseLexica.COMA, yytext()); }
-"("                  { return new Token(ClaseLexica.LPAR, yytext()); }
-")"                  { return new Token(ClaseLexica.RPAR, yytext()); }
+";"         { System.out.println(new Token(ClaseLexica.PYC, ";")); }
+","         { System.out.println(new Token(ClaseLexica.COMA, ",")); }
+"("         { System.out.println(new Token(ClaseLexica.LPAR, "(")); }
+")"         { System.out.println(new Token(ClaseLexica.RPAR, ")")); }
 
-/* Errores */
-.                    { System.out.println("Error: Caracter no reconocido: " + yytext()); }
-
-%%
+.           { /* Ignorar cualquier otro carácter */ }
