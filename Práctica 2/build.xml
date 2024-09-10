@@ -1,42 +1,34 @@
-<?xml version="1.0"?>
-<project name="LexerProject" basedir="." default="run">
+<project name="Compiladores" basedir="." default="run">
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="jflex.jar" value="path/to/jflex-full-1.8.2.jar"/> <!-- Asegúrate de tener el JFlex jar aquí -->
+    <property name="test.file" value="src/tst/prueba.txt"/>
 
-    <!-- Define where to put compiled class files -->
-    <property name="build.dir" location="build"/>
-    <property name="src.dir" location="src"/>
-    <property name="jflex.dir" location="src/main/jflex"/>
-    <property name="class.dir" location="src/main/java"/>
-    <property name="test.file" location="src/tst/prueba.txt"/>
-    <property name="lib.dir" location="lib"/>
-    <property name="jflex.jar" location="${lib.dir}/jflex-1.x.x.jar"/>
-
-    <!-- Create build directory if it doesn't exist -->
     <target name="init">
         <mkdir dir="${build.dir}"/>
     </target>
 
-    <!-- Generate lexer from JFlex file -->
     <target name="generate" depends="init">
         <taskdef name="jflex" classname="jflex.anttask.JFlexTask" classpath="${jflex.jar}"/>
-        <jflex file="${jflex.dir}/Lexer.flex"/>
+        <jflex file="${src.dir}/main/jflex/Lexer.flex" destdir="${build.dir}/main/jflex"/>
     </target>
 
-    <!-- Compile Java sources -->
     <target name="compile" depends="generate">
-        <javac srcdir="${src.dir}/main/java" destdir="${build.dir}">
-            <include name="**/*.java"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}">
+            <classpath>
+                <pathelement path="${build.dir}"/>
+                <pathelement path="${jflex.jar}"/>
+            </classpath>
         </javac>
     </target>
 
-    <!-- Run the lexer -->
     <target name="run" depends="compile">
         <java classname="main.jflex.Lexer" fork="true">
-            <arg value="${test.file}"/>
             <classpath>
-                <fileset dir="${build.dir}" includes="**/*.class"/>
+                <pathelement path="${build.dir}"/>
                 <pathelement path="${jflex.jar}"/>
             </classpath>
+            <arg value="${test.file}"/>
         </java>
     </target>
-
 </project>
