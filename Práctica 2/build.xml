@@ -7,6 +7,8 @@
     <property name="jflex.dir" location="src/main/jflex"/>
     <property name="class.dir" location="src/main/java"/>
     <property name="test.file" location="src/tst/prueba.txt"/>
+    <property name="lib.dir" location="lib"/>
+    <property name="jflex.jar" location="${lib.dir}/jflex-1.x.x.jar"/>
 
     <!-- Create build directory if it doesn't exist -->
     <target name="init">
@@ -15,6 +17,7 @@
 
     <!-- Generate lexer from JFlex file -->
     <target name="generate" depends="init">
+        <taskdef name="jflex" classname="jflex.anttask.JFlexTask" classpath="${jflex.jar}"/>
         <jflex file="${jflex.dir}/Lexer.flex"/>
     </target>
 
@@ -31,6 +34,7 @@
             <arg value="${test.file}"/>
             <classpath>
                 <fileset dir="${build.dir}" includes="**/*.class"/>
+                <pathelement path="${jflex.jar}"/>
             </classpath>
         </java>
     </target>
