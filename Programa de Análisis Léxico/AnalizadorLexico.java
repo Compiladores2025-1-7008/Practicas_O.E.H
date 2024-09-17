@@ -1,15 +1,26 @@
+/*
+ * Universidad Nacional Autónoma de México
+ * Facultad de Ciencias
+ * Compiladores 2025-1
+ * Programa de Análisis Léxico
+ * Alumno: Osorio Escandón Huriel
+ */
+
 import java.util.ArrayList;
 import java.util.List;
 
-// Clase que representa un Token (cada elemento que el analizador léxico identifica)
+// Clase que representa un Token, es decir, cada elemento que el analizador léxico identifica
 class Token {
-    // Definimos los tipos de tokens que se pueden identificar
+    // Se definen los tipos de tokens que se pueden identificar
     public enum Tipo {
-        IDENTIFICADOR, NUMERO_ENTERO, NUMERO_DECIMAL, OPERADOR_ASIGNACION, OPERADOR_SUMA, ESPACIO
+        ID, NUM_ENTERO, NUM_DECIMAL, OPERADOR_ASIGNACION, OPERADOR_SUMA, ESPACIO
     }
 
-    private Tipo tipo; // Tipo del token (identificador, número, operador, etc.)
-    private String valor; // Valor del token (por ejemplo, "x", "=", "12")
+    // Tipo del token
+    private Tipo tipo;
+    
+    // Valor del token
+    private String valor;
 
     // Constructor para inicializar un token con su tipo y valor
     public Token(Tipo tipo, String valor) {
@@ -27,7 +38,7 @@ class Token {
         return valor;
     }
 
-    // Método para representar el token como cadena (útil para imprimir)
+    // Método para representar el token como cadena
     @Override
     public String toString() {
         return "Token{" +
@@ -39,17 +50,25 @@ class Token {
 
 // Clase principal que implementa el analizador léxico
 public class AnalizadorLexico {
-    private String input; // Cadena de entrada (el código fuente a analizar)
-    private int posicion; // Posición actual dentro de la cadena de entrada
+
+    // Cadena de entrada, es decir, el código fuente a analizar
+    private String input;
+
+    // Posición actual dentro de la cadena de entrada
+    private int posicion;
 
     // Constructor para inicializar el analizador con la entrada
     public AnalizadorLexico(String input) {
         this.input = input;
-        this.posicion = 0; // Inicialmente, comenzamos en la posición 0
+
+        // De inicio se posiciona en 0
+        this.posicion = 0;
     }
 
-    // Método que retorna el siguiente carácter de la entrada
-    // Si llegamos al final de la entrada, retorna '\0' (indica fin de entrada)
+    /*
+     * Método que regresa el siguiente carácter de la entrada, en dónde, si se llega al final de la entrada,
+     * se regresa \0 indicando el fin de la entrada
+     */
     private char siguienteCaracter() {
         return posicion < input.length() ? input.charAt(posicion) : '\0';
     }
@@ -59,48 +78,66 @@ public class AnalizadorLexico {
         posicion++;
     }
 
-    // Método que realiza el análisis léxico y retorna una lista de tokens
+    // Método que hace el análisis léxico y regresa una lista de tokens
     public List<Token> analizar() {
-        List<Token> tokens = new ArrayList<>(); // Lista donde almacenaremos los tokens
 
-        // Mientras no hayamos alcanzado el final de la entrada
+        // Lista que alamacena los tokens
+        List<Token> tokens = new ArrayList<>();
+
+        // Si no se a alcanzado el final de la entrada
         while (posicion < input.length()) {
-            char actual = siguienteCaracter(); // Obtenemos el carácter actual
 
-            // Ignorar espacios en blanco
+            // Se obtiene el carácter actual
+            char actual = siguienteCaracter();
+
+            // Se ignoran los espacios en blanco
             if (Character.isWhitespace(actual)) {
-                avanzar(); // Simplemente avanzamos sin agregar ningún token
+
+                // Se avanza sin agregar ningún token
+                avanzar();
                 continue;
             }
 
-            // Identificadores (formados solo por letras)
+            // Identificadores formados solo por letras
             if (Character.isLetter(actual)) {
-                StringBuilder identificador = new StringBuilder(); // Acumulamos el identificador
-                // Mientras sea una letra, seguimos acumulando
+
+                // Se acumula el identificador
+                StringBuilder identificador = new StringBuilder();
+
+                // Si es una letra, se sigue acumulando
                 while (Character.isLetter(siguienteCaracter())) {
                     identificador.append(siguienteCaracter());
                     avanzar();
                 }
-                // Añadimos el identificador como un token
-                tokens.add(new Token(Token.Tipo.IDENTIFICADOR, identificador.toString()));
+
+                // Se agrega el identificador como un token
+                tokens.add(new Token(Token.Tipo.ID, identificador.toString()));
                 continue;
             }
 
-            // Números (enteros y decimales)
+            // Números enteros y decimales
             if (Character.isDigit(actual)) {
-                StringBuilder numero = new StringBuilder(); // Acumulamos el número
-                boolean esDecimal = false; // Para verificar si el número es decimal
 
-                // Mientras sea un dígito, seguimos acumulando
+                // Se acumula el número
+                StringBuilder numero = new StringBuilder();
+
+                // Se verifica si el número es decimal
+                boolean esDecimal = false;
+
+                // Si es un dígito, se sigue acumulando
                 while (Character.isDigit(siguienteCaracter())) {
                     numero.append(siguienteCaracter());
                     avanzar();
                 }
 
-                // Verificamos si hay un punto para número decimal
+                // Se verifica si hay un punto para número decimal
                 if (siguienteCaracter() == '.') {
-                    esDecimal = true; // Es un número decimal
-                    numero.append('.'); // Añadimos el punto decimal
+
+                    // Se define un número decimal
+                    esDecimal = true;
+
+                    // Se agrega el punto decimal
+                    numero.append('.');
                     avanzar();
 
                     // Después del punto, deben seguir dígitos
@@ -110,48 +147,58 @@ public class AnalizadorLexico {
                     }
                 }
 
-                // Añadimos el número como entero o decimal según corresponda
+                // Se agrega el número como entero o decimal según corresponda
                 if (esDecimal) {
-                    tokens.add(new Token(Token.Tipo.NUMERO_DECIMAL, numero.toString()));
+                    tokens.add(new Token(Token.Tipo.NUM_DECIMAL, numero.toString()));
                 } else {
-                    tokens.add(new Token(Token.Tipo.NUMERO_ENTERO, numero.toString()));
+                    tokens.add(new Token(Token.Tipo.NUM_ENTERO, numero.toString()));
                 }
                 continue;
             }
 
-            // Operador de asignación '='
+            // Operador de asignación =
             if (actual == '=') {
-                tokens.add(new Token(Token.Tipo.OPERADOR_ASIGNACION, "=")); // Añadimos el token de asignación
-                avanzar(); // Avanzamos para procesar el siguiente carácter
+
+                // Se agrega el token de asignación
+                tokens.add(new Token(Token.Tipo.OPERADOR_ASIGNACION, "="));
+
+                // Se avanza para poder procesar al siguiente carácter
+                avanzar();
                 continue;
             }
 
-            // Operador de suma '+'
+            // Operador de suma +
             if (actual == '+') {
-                tokens.add(new Token(Token.Tipo.OPERADOR_SUMA, "+")); // Añadimos el token de suma
-                avanzar(); // Avanzamos para procesar el siguiente carácter
+
+                // Se agrega el token de suma
+                tokens.add(new Token(Token.Tipo.OPERADOR_SUMA, "+"));
+
+                // Se avanza para poder procesar al siguiente carácter
+                avanzar();
                 continue;
             }
 
-            // Si encontramos un carácter que no reconocemos, lanzamos un error
+            // Si se encuentra un carácter no reconocido, se imprime un error
             throw new RuntimeException("Carácter no reconocido: " + actual);
         }
 
-        return tokens; // Retornamos la lista de tokens encontrados
+        // Se regresa la lista de tokens encontrados
+        return tokens;
     }
 
     // Método principal para probar el analizador léxico
     public static void main(String[] args) {
-        // Código de prueba
-        String codigo = "x = 12 + 5.5";
 
-        // Creamos una instancia del analizador léxico con el código de prueba
+        // Código para prueba
+        String codigo = "varA = 100 + 25.75 + varB";
+
+        // Se crea una instancia del analizador léxico con el código para prueba
         AnalizadorLexico analizador = new AnalizadorLexico(codigo);
 
-        // Ejecutamos el análisis léxico
+        // Se ejecuta el análisis léxico
         List<Token> tokens = analizador.analizar();
 
-        // Imprimimos los tokens generados
+        // Se imprimen los tokens generados
         for (Token token : tokens) {
             System.out.println(token);
         }
