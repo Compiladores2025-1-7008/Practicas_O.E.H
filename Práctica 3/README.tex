@@ -1,0 +1,237 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[spanish,mexico]{babel}
+
+\usepackage{tikz}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\usepackage[letter, left=2.0cm, right=2.0cm, top=2.0cm, bottom=2.0cm]{geometry}
+\usepackage{amsmath}
+\usepackage{blindtext}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usetikzlibrary{automata, positioning}
+
+\title{ Universidad Nacional Autónoma de México \\ Facultad de Ciencias \\ Compiladores \\ Práctica 3}
+
+\author{ Osorio Escandón Huriel | 317204652 | Huriel117@ciencias.unam.mx }
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{enumerate}
+    \item Determinar los conjuntos $ N, \Sigma $ y el símbolo inicial $ S $.
+
+    \textbf{Conjuntos de la Gramática G}
+
+    \textbf{Conjunto de No Terminales $(N)$}
+
+    El conjunto de no terminales es:
+
+    \[
+    N = \{ \text{programa, declaraciones, declaracion, tipo, lista\_var, sentencias, sentencia, expresion} \}
+    \]
+
+    \textbf{Conjunto de Terminales $(\Sigma)$}
+
+    El conjunto de terminales es:
+
+    \[
+    \Sigma = \{ \text{int, float, ,, =, ;, (, ), +, -, *, /, if, else, while, identificador, numero} \}
+    \]
+
+    \textbf{Símbolo Inicial $(S)$}
+
+    El símbolo inicial de la gramática es:
+
+    \[
+    S = \text{programa}
+    \]
+
+    \item Mostrar en el archivo el proceso de eliminación de ambigüedad o justificar, en caso de no ser necesario.
+
+    \textbf{Eliminación de Ambigüedad}
+
+    \textbf{Expresiones Aritméticas}
+
+    La gramática original para las expresiones aritméticas presenta una potencial ambigüedad, ya que no especifica la precedencia ni la asociatividad de los operadores \texttt{+}, \texttt{-}, \texttt{*} y \texttt{/}. Para resolver esta ambigüedad, se van a introducir reglas que establecen una precedencia adecuada y una asociatividad por la izquierda.
+
+    La producción original:
+
+        \begin{verbatim}
+    expresion → expresion + expresion
+              | expresion - expresion
+              | expresion * expresion
+              | expresion / expresion
+              | identificador
+              | numero
+              | ( expresion )
+    \end{verbatim}
+
+    Las modificaciones son las siguientes:
+
+    \begin{verbatim}
+    expresion → expresion_suma
+    expresion_suma → expresion_suma + expresion_mult | expresion_suma - expresion_mult | 
+    expresion_mult
+    expresion_mult → expresion_mult * expresion_unaria | expresion_mult / expresion_unaria | 
+    expresion_unaria
+    expresion_unaria → identificador | numero | ( expresion )
+    \end{verbatim}
+
+    De esta manera, garantizamos que \texttt{*} y \texttt{/} tienen mayor precedencia que \texttt{+} y \texttt{-}, y todas las operaciones son asociativas por la izquierda.
+
+    \textbf{Problema del if-else colgante}
+
+    La gramática original presenta el problema del \textit{if-else colgante}, que puede llevar a ambigüedades en la interpretación de las sentencias. Para resolverlo, se harán las siguientes modificaciones:
+
+    \begin{verbatim}
+    sentencia → sentencia_if | sentencia_otra
+    sentencia_if → if ( expresion ) sentencia_if else sentencia_if 
+                 | if ( expresion ) sentencia_otra
+    sentencia_otra → identificador = expresion ; | while ( expresion ) sentencias | { sentencias }
+    \end{verbatim}
+
+    De esta manera, garantizamos que un \texttt{else} siempre se empareja con el \texttt{if} más cercano que lo requiere, eliminando así la ambigüedad.
+
+    \item Mostrar en el archivo el proceso de eliminación de la recursividad izquierda o justificar, en caso de no ser necesario. 
+
+    \textbf{Eliminación de la Recursividad Izquierda}
+
+    En la gramática original, se presentan varias producciones con recursividad izquierda, lo que puede causar problemas en un analizador sintáctico de descenso recursivo. 
+
+    \textbf{Producción de \texttt{declaraciones}}
+
+    La producción original es recursiva a la izquierda:
+
+    \begin{verbatim}
+    declaraciones → declaraciones declaracion | declaracion
+    \end{verbatim}
+
+    La nueva producción, sin recursividad izquierda, es:
+
+    \begin{verbatim}
+    declaraciones → declaracion declaraciones'
+    declaraciones' → declaracion declaraciones' | ε
+    \end{verbatim}
+
+    \textbf{Producción de \texttt{lista\_var}}
+
+    La producción original:
+
+    \begin{verbatim}
+    lista_var → lista_var , identificador | identificador
+    \end{verbatim}
+
+    La nueva producción sin recursividad izquierda:
+
+    \begin{verbatim}
+    lista_var → identificador lista_var'
+    lista_var' → , identificador lista_var' | ε
+    \end{verbatim}
+
+    \textbf{Producción de \texttt{sentencias}}
+
+    La producción original:
+
+    \begin{verbatim}
+    sentencias → sentencias sentencia | sentencia
+    \end{verbatim}
+
+    La nueva producción sin recursividad izquierda:
+
+    \begin{verbatim}
+    sentencias → sentencia sentencias'
+    sentencias' → sentencia sentencias' | ε
+    \end{verbatim}
+
+    \item Mostrar en el archivo el proceso de factorización izquierda o justificar, en caso de no ser necesario.
+
+    \textbf{Factorización Izquierda}
+
+    Después de analizar las producciones de la gramática, notemos que no es necesario realizar factorización izquierda, ya que no existen prefijos comunes entre las alternativas de las producciones.
+
+    \textbf{Producción de \texttt{expresion}}
+
+    La producción original para \texttt{expresion} no contiene prefijos comunes:
+
+    \begin{verbatim}
+    expresion → expresion + expresion
+              | expresion - expresion
+              | expresion * expresion
+              | expresion / expresion
+              | identificador
+              | numero
+              | ( expresion )
+    \end{verbatim}
+
+    \textbf{Producción de \texttt{sentencia}}
+
+    La producción de \texttt{sentencia} tampoco presenta prefijos comunes:
+
+    \begin{verbatim}
+    sentencia → identificador = expresion ;
+            | if ( expresion ) sentencias else sentencias
+            | while ( expresion ) sentencias
+    \end{verbatim}
+
+    \textbf{Producción de \texttt{declaraciones}}
+
+    Las producciones para \texttt{declaraciones} tampoco requieren factorización izquierda, ya que no hay prefijos comunes:
+
+    \begin{verbatim}
+    declaraciones → declaracion declaraciones'
+    declaraciones' → declaracion declaraciones' | ε
+    \end{verbatim}
+
+    Tomando en cuenta lo anterior, se tiene que, no es necesario realizar la factorización izquierda en la gramática.
+
+    \item Mostrar en el archivo los nuevos conjuntos $N$ y $P$.
+
+    \textbf{Nuevos Conjuntos $N$ y $P$}
+
+    Después de realizar las modificaciones necesarias, los conjuntos de no terminales y producciones son los siguientes:
+
+    \textbf{Conjunto de No Terminales $(N)$}
+
+    El conjunto de no terminales es:
+
+    $ N = \{ $programa, declaraciones, declaraciones', declaracion, tipo, lista\_var, lista\_var', sentencias, sentencias', sentencia, expresion, expresion\_suma, expresion\_mult, expresion\_unaria $ \} $
+
+    \textbf{Conjunto de Producciones $(P)$}
+
+    Las producciones de la gramática son las siguientes:
+
+    \begin{verbatim}
+    programa → declaraciones sentencias
+
+    declaraciones → declaracion declaraciones'
+    declaraciones' → declaracion declaraciones' | ε
+
+    declaracion → tipo lista_var ;
+
+    tipo → int | float
+
+    lista_var → identificador lista_var'
+    lista_var' → , identificador lista_var' | ε
+
+    sentencias → sentencia sentencias'
+    sentencias' → sentencia sentencias' | ε
+
+    sentencia → identificador = expresion ;
+              | if ( expresion ) sentencias else sentencias
+              | while ( expresion ) sentencias
+
+    expresion → expresion_suma
+    expresion_suma → expresion_suma + expresion_mult | expresion_suma - expresion_mult | 
+    expresion_mult 
+    expresion_mult → expresion_mult * expresion_unaria | expresion_mult / expresion_unaria | 
+    expresion_unaria
+    expresion_unaria → identificador | numero | ( expresion )
+    \end{verbatim}
+    
+\end{enumerate}
+\end{document}
